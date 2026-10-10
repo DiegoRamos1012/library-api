@@ -2,6 +2,7 @@
 
 namespace Library.Api.Modules.Users.Repositories;
 
+// Com a interface, podemos testar os serviços sem precisar de banco de dados
 public interface IUserRepository
 {
     Task<User?> GetByIdAsync(Guid id);
