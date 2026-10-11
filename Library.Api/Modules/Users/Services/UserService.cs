@@ -1,22 +1,43 @@
-﻿using Library.Api.Modules.Users.Domain;
+﻿using Library.Api.Common.Exceptions;
+using Library.Api.Common.Utils;
+using Library.Api.Config.Security;
+using Library.Api.Modules.Users.Domain;
+using Library.Api.Modules.Users.Dtos.Request;
 using Library.Api.Modules.Users.Repositories;
+
 
 namespace Library.Api.Modules.Users.Services;
 
-public class UserService : IUserRepository
+public class UserService (IUserRepository userRepository, PasswordHasher passwordHasher)
 {
-    public Task<User?> GetByIdAsync(Guid id)
+    public async Task<User> CreateAsync(CreateUserRequest dto)
     {
-        throw new NotImplementedException();
+        
+        var email = TextNormalizer.NormalizeEmail(dto.Email);
+        
+        if (await userRepository.ExistsByEmailAsync(email))
+        {
+            throw new BusinessException.EmailAlreadyExistsException();
+        }
+
+        var passwordHash = passwordHasher.PasswordEncoder(dto.Password);
+        
+        var newUser = User.Create(
+            fullName: dto.FullName,
+            email: email,
+            passwordHash: passwordHash,
+            role: dto.Role
+        );
+        
+        await userRepository.AddAsync(newUser);
+
+        return newUser;
     }
 
-    public Task<User?> GetByEmailAsync(string email)
+    public async Task<User> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        var user = await userRepository.GetByIdAsync(id);
 
-    public Task AddAsync(User user)
-    {
-        throw new NotImplementedException();
+        return user ?? throw new BusinessException.UserNotFoundException();
     }
 }

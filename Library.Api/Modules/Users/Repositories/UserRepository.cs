@@ -6,11 +6,20 @@ namespace Library.Api.Modules.Users.Repositories;
 
 public class UserRepository(AppDbContext ctx) : IUserRepository
 {
+
+    public async Task<bool> ExistsByIdAsync(Guid id)
+    {
+        return await ctx.Users.AnyAsync(u => u.Id == id);
+    }
     public async Task<User?> GetByIdAsync(Guid id)
     {
         return await ctx.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    public async Task<bool> ExistsByEmailAsync(string email)
+    {
+        return await ctx.Users.AnyAsync(u => u.Email == email);
+    }
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await ctx.Users.FirstOrDefaultAsync(u => u.Email == email);
