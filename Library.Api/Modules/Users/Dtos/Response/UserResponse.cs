@@ -1,4 +1,5 @@
-﻿using Library.Api.Modules.Users.Domain.Enums;
+﻿using Library.Api.Modules.Users.Domain;
+using Library.Api.Modules.Users.Domain.Enums;
 
 namespace Library.Api.Modules.Users.Dtos.Response;
 

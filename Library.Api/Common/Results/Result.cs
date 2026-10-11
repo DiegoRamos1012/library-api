@@ -10,7 +10,7 @@ public sealed class Result<T>
         _error = error;
     }
 
-    public bool IsSuccess => _error is null;
+    private bool IsSuccess => _error is null;
 
     public bool IsFailure => !IsSuccess;
 

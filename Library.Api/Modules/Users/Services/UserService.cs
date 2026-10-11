@@ -6,7 +6,6 @@ using Library.Api.Modules.Users.Domain;
 using Library.Api.Modules.Users.Dtos.Request;
 using Library.Api.Modules.Users.Repositories;
 
-
 namespace Library.Api.Modules.Users.Services;
 
 public class UserService (IUserRepository userRepository, PasswordHasher passwordHasher)
