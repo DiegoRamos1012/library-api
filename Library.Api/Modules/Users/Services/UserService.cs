@@ -1,4 +1,5 @@
 ﻿using Library.Api.Common.Exceptions;
+using Library.Api.Common.Results;
 using Library.Api.Common.Utils;
 using Library.Api.Config.Security;
 using Library.Api.Modules.Users.Domain;
@@ -10,34 +11,42 @@ namespace Library.Api.Modules.Users.Services;
 
 public class UserService (IUserRepository userRepository, PasswordHasher passwordHasher)
 {
-    public async Task<User> CreateAsync(CreateUserRequest dto)
+    public async Task<Result<User>> CreateAsync(CreateUserRequest dto)
     {
         
         var email = TextNormalizer.NormalizeEmail(dto.Email);
         
         if (await userRepository.ExistsByEmailAsync(email))
         {
-            throw new BusinessException.EmailAlreadyExistsException();
+            return Result<User>.Failure(UserErrors.EmailAlreadyExists);
         }
 
         var passwordHash = passwordHasher.PasswordEncoder(dto.Password);
         
-        var newUser = User.Create(
-            fullName: dto.FullName,
-            email: email,
-            passwordHash: passwordHash,
-            role: dto.Role
-        );
-        
+        User newUser;
+
+        try
+        {
+            newUser = User.Create(
+                fullName: dto.FullName,
+                email: email,
+                passwordHash: passwordHash,
+                role: dto.Role);
+        }
+        catch (DomainException ex)
+        {
+            return Result<User>.Failure("USER_INVALID_INPUT", ex.Message);
+        }
+
         await userRepository.AddAsync(newUser);
 
-        return newUser;
+        return Result<User>.Success(newUser);
     }
 
-    public async Task<User> GetByIdAsync(Guid id)
+    public async Task<Result<User>> GetByIdAsync(Guid id)
     {
-        var user = await userRepository.GetByIdAsync(id);
+        var fetchedUser = await userRepository.GetByIdAsync(id);
 
-        return user ?? throw new BusinessException.UserNotFoundException();
+        return fetchedUser is null ? Result<User>.Failure(UserErrors.NotFound) : Result<User>.Success(fetchedUser);
     }
 }
