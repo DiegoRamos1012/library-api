@@ -1,4 +1,4 @@
-﻿using Library.Api.Common.Results;
+﻿using Library.Api.Common.Controllers;
 using Library.Api.Modules.Users.Domain;
 using Library.Api.Modules.Users.Dtos.Request;
 using Library.Api.Modules.Users.Dtos.Response;
@@ -9,7 +9,7 @@ namespace Library.Api.Modules.Users.Controllers;
 
 [ApiController]
 [Route("users")]
-public sealed class UserController(UserService userService) : ControllerBase
+public sealed class UserController(UserService userService) : ApiControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<UserResponse>> CreateUser(CreateUserRequest request)
@@ -50,29 +50,4 @@ public sealed class UserController(UserService userService) : ControllerBase
             user.IsActive
         );
     }
-    
-    
-    private ObjectResult ToProblem(ResultError error)
-    {
-        var statusCode = error.Code switch
-        {
-            "USER_EMAIL_ALREADY_EXISTS" => StatusCodes.Status409Conflict,
-            "USER_INVALID_INPUT" => StatusCodes.Status400BadRequest,
-            "USER_NOT_FOUND" => StatusCodes.Status404NotFound,
-            _ => StatusCodes.Status500InternalServerError
-        };
-
-        return Problem(
-            statusCode: statusCode,
-            title: error.Code,
-            detail: error.Message,
-            extensions: error.Details is null
-                ? null
-                : new Dictionary<string, object?>
-                {
-                    ["details"] = error.Details
-                }
-        );
-    }
-
 }
