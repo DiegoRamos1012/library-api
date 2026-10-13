@@ -10,27 +10,27 @@ namespace Library.Api.Modules.Users.Services;
 
 public class UserService (IUserRepository userRepository, PasswordHasher passwordHasher)
 {
-    public async Task<Result<User>> CreateAsync(CreateUserRequest dto)
+    public async Task<Result<User>> CreateAsync(CreateUserRequest request)
     {
         
-        var email = TextNormalizer.NormalizeEmail(dto.Email);
+        var email = TextNormalizer.NormalizeEmail(request.Email);
         
         if (await userRepository.ExistsByEmailAsync(email))
         {
             return Result<User>.Failure(UserErrors.EmailAlreadyExists);
         }
 
-        var passwordHash = passwordHasher.PasswordEncoder(dto.Password);
+        var passwordHash = passwordHasher.PasswordEncoder(request.Password);
         
         User newUser;
 
         try
         {
             newUser = User.Create(
-                fullName: dto.FullName,
+                fullName: request.FullName,
                 email: email,
                 passwordHash: passwordHash,
-                role: dto.Role);
+                role: request.Role);
         }
         catch (DomainException ex)
         {
