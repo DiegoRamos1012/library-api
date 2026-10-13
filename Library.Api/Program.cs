@@ -1,6 +1,7 @@
 using System.Text;
 using Library.Api.Config.Security;
 using Library.Api.Data;
+using Library.Api.Data.Seed;
 using Library.Api.Modules.Auth.Services;
 using Library.Api.Modules.Users.Repositories;
 using Library.Api.Modules.Users.Services;
@@ -18,6 +19,8 @@ var jwtOptions = builder.Configuration
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 
 // Registro de serviços
+builder.Services.AddScoped<ManagerSeeder>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<UserService>();
@@ -52,6 +55,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope()) // CreateSc ope abre um escopo manual apenas para uso do Seeder
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<ManagerSeeder>();
+    await seeder.SeedAsync();
+}
 
 // Configuração de pipeline e ativação
 app.UseAuthentication(); // Descobre o usuário

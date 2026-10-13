@@ -1,17 +1,22 @@
 ﻿using Library.Api.Common.Controllers;
 using Library.Api.Modules.Users.Domain;
+using Library.Api.Modules.Users.Domain.Enums;
 using Library.Api.Modules.Users.Dtos.Request;
 using Library.Api.Modules.Users.Dtos.Response;
 using Library.Api.Modules.Users.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Modules.Users.Controllers;
 
 [ApiController]
 [Route("users")]
+[Authorize]
 public sealed class UserController(UserService userService) : ApiControllerBase
 {
     [HttpPost]
+    [Authorize(Roles = nameof(UserRole.MANAGER))]
+        
     public async Task<ActionResult<UserResponse>> CreateUser(CreateUserRequest request)
     {
         var result = await userService.CreateAsync(request);
