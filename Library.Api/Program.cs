@@ -56,7 +56,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope()) // CreateSc ope abre um escopo manual apenas para uso do Seeder
+using (var scope = app.Services.CreateScope()) // CreateScope abre um escopo manual apenas para uso do Seeder
 {
     var seeder = scope.ServiceProvider.GetRequiredService<ManagerSeeder>();
     await seeder.SeedAsync();

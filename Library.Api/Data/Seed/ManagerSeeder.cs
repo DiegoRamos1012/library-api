@@ -21,7 +21,7 @@ public class ManagerSeeder(AppDbContext context, UserService userService, IConfi
             || string.IsNullOrWhiteSpace(password))
             return;
 
-        var request = new CreateUserRequest(fullName, email, password, UserRole.MANAGER);
+        var request = new CreateUserRequest(fullName, email, password, UserRole.Manager);
         var result = await userService.CreateAsync(request);
 
         if (result.IsFailure)

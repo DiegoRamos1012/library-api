@@ -9,4 +9,7 @@ public static class UserErrors
 
     public static readonly ResultError NotFound =
         new("USER_NOT_FOUND", "User not found");
+
+    public static readonly ResultError UserAlreadyDeactivated =
+        new("USER_ALREADY_DEACTIVATED", "User already deactivated");
 }

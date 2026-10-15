@@ -48,4 +48,21 @@ public class UserService (IUserRepository userRepository, PasswordHasher passwor
 
         return fetchedUser is null ? Result<User>.Failure(UserErrors.NotFound) : Result<User>.Success(fetchedUser);
     }
+
+    public async Task<Result<User>> DeactivateUserAsync(Guid id)
+    {
+        var fetchedUser = await userRepository.GetByIdAsync(id);
+
+        if (fetchedUser is null)
+            return Result<User>.Failure(UserErrors.NotFound);
+
+        if (!fetchedUser.IsActive)
+            return Result<User>.Failure(UserErrors.UserAlreadyDeactivated);
+
+        fetchedUser.Deactivate();
+
+        await userRepository.SaveChangesAsync();
+
+        return Result<User>.Success(fetchedUser);
+    }
 }

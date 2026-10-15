@@ -41,4 +41,9 @@ public class User : BaseEntity
             passwordHash,
             role);
     }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
 }

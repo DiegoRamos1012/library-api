@@ -15,7 +15,7 @@ namespace Library.Api.Modules.Users.Controllers;
 public sealed class UserController(UserService userService) : ApiControllerBase
 {
     [HttpPost]
-    [Authorize(Roles = nameof(UserRole.MANAGER))]
+    [Authorize(Roles = nameof(UserRole.Manager))]
         
     public async Task<ActionResult<UserResponse>> CreateUser(CreateUserRequest request)
     {
@@ -36,6 +36,20 @@ public sealed class UserController(UserService userService) : ApiControllerBase
     public async Task<ActionResult<UserResponse>> GetByIdAsync(Guid id)
     {
         var result = await userService.GetByIdAsync(id);
+        
+        if (result.IsFailure)
+            return ToProblem(result.Error);
+
+        var response = ToResponse(result.Value);
+
+        return Ok(response);
+    }
+
+    [HttpPatch("{id:guid}/deactivate")]
+    [Authorize(Roles = nameof(UserRole.Manager))]
+    public async Task<ActionResult<UserResponse>> DeactivateUser(Guid id)
+    {
+        var result = await userService.DeactivateUserAsync(id);
         
         if (result.IsFailure)
             return ToProblem(result.Error);
