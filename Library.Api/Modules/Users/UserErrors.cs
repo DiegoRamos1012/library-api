@@ -12,4 +12,8 @@ public static class UserErrors
 
     public static readonly ResultError UserAlreadyDeactivated =
         new("USER_ALREADY_DEACTIVATED", "User already deactivated");
+    
+    public static readonly ResultError UserAlreadyActivated =
+        new("USER_ALREADY_ACTIVATED", "User already activated");
+    
 }

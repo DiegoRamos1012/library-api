@@ -46,4 +46,9 @@ public class User : BaseEntity
     {
         IsActive = false;
     }
+
+    public void Reactivate()
+    {
+        IsActive = true;
+    }
 }

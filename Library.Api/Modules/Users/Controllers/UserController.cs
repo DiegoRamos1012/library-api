@@ -59,6 +59,20 @@ public sealed class UserController(UserService userService) : ApiControllerBase
         return Ok(response);
     }
     
+    [HttpPatch("{id:guid}/activate")]
+    [Authorize(Roles = nameof(UserRole.Manager))]
+    public async Task<ActionResult<UserResponse>> ReactivateUser(Guid id)
+    {
+        var result = await userService.ReactivateUserAsync(id);
+        
+        if (result.IsFailure)
+            return ToProblem(result.Error);
+
+        var response = ToResponse(result.Value);
+
+        return Ok(response);
+    }
+    
     private static UserResponse ToResponse(User user)
     {
         return new UserResponse(
