@@ -11,7 +11,8 @@ public abstract class ApiControllerBase : ControllerBase
         var statusCode = error.Code switch
         {
             "USER_NOT_FOUND" => StatusCodes.Status404NotFound,
-            "USER_EMAIL_ALREADY_EXISTS" or "USER_ALREADY_DEACTIVATED" or "USER_ALREADY_ACTIVATED" => StatusCodes.Status409Conflict,
+            "USER_EMAIL_ALREADY_EXISTS" or "USER_ALREADY_DEACTIVATED" or "USER_ALREADY_ACTIVATED" or "USER_DEACTIVATED" 
+                => StatusCodes.Status409Conflict,
             "USER_INVALID_INPUT" => StatusCodes.Status400BadRequest,
             "AUTH_INVALID_CREDENTIALS" => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError

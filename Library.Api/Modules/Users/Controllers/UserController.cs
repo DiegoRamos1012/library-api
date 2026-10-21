@@ -45,6 +45,20 @@ public sealed class UserController(UserService userService) : ApiControllerBase
         return Ok(response);
     }
 
+    [HttpPatch("{id:guid}/change-user-name")]
+    [Authorize(Roles = nameof(UserRole.Manager))]
+    public async Task<ActionResult<UserResponse>> ChangeUserName(Guid id, ChangeUserNameRequest request )
+    {
+        var result = await userService.ChangeUserNameAsync(id, request.NewFullName);
+        
+        if (result.IsFailure)
+            return ToProblem(result.Error);
+
+        var response = ToResponse(result.Value);
+
+        return Ok(response);
+    }
+    
     [HttpPatch("{id:guid}/deactivate")]
     [Authorize(Roles = nameof(UserRole.Manager))]
     public async Task<ActionResult<UserResponse>> DeactivateUser(Guid id)

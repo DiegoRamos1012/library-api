@@ -7,13 +7,11 @@ namespace Library.Api.Modules.Users.Domain;
 
 public class User : BaseEntity
 {
-    public string FullName { get; private set; } = null!;
-    public string Email { get; private set; } = null!;
-    public string PasswordHash { get; private set; } = null!;
+    public string FullName { get; private set; }
+    public string Email { get; private set; }
+    public string PasswordHash { get; private set; }
     public UserRole Role { get; private set; }
     public bool IsActive { get; private set; }
-
-    private User() { } // usado só pelo EF Core
 
     private User(string fullName, string email, string passwordHash, UserRole role)
     {
@@ -42,6 +40,22 @@ public class User : BaseEntity
             role);
     }
 
+    public void ChangeFullName(string newName)
+    {
+        if (!IsActive)
+            throw new DomainException("Cannot change the name of an inactive user.");
+        
+        if (string.IsNullOrWhiteSpace(newName))
+            throw new DomainException("Name is required");
+
+        var normalizedName = TextNormalizer.NormalizeName(newName);
+
+        if (FullName == normalizedName)
+            return;
+
+        FullName = normalizedName;
+    }
+    
     public void Deactivate()
     {
         IsActive = false;
