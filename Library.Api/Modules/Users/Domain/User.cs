@@ -1,6 +1,7 @@
 ﻿using Library.Api.Common;
 using Library.Api.Common.Exceptions;
 using Library.Api.Common.Utils;
+using Library.Api.Config.Security;
 using Library.Api.Modules.Users.Domain.Enums;
 
 namespace Library.Api.Modules.Users.Domain;
@@ -55,7 +56,17 @@ public class User : BaseEntity
 
         FullName = normalizedName;
     }
-    
+
+    public void ChangePassword(string newPasswordHash)
+    {
+        if (!IsActive)
+            throw new DomainException("Cannot change the password of an inactive user.");
+        
+        if (string.IsNullOrWhiteSpace(newPasswordHash))
+            throw new DomainException("Password is required");
+
+        PasswordHash = newPasswordHash;
+    }
     public void Deactivate()
     {
         IsActive = false;
