@@ -24,6 +24,18 @@ public class UserRepository(AppDbContext ctx) : IUserRepository
     {
         return await ctx.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
+    
+    public async Task<List<User>> FindAllAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        return await ctx.Users
+            .AsNoTracking()
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 
     public async Task AddAsync(User user)
     {

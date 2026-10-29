@@ -44,6 +44,28 @@ public sealed class UserController(UserService userService) : ApiControllerBase
 
         return Ok(response);
     }
+    
+    [HttpGet]
+    [Authorize(Roles = nameof(UserRole.Manager))]
+    public async Task<ActionResult<IReadOnlyList<UserResponse>>> FindAllAsync(
+        int page = 1,
+        int pageSize = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await userService.FindAllAsync(
+            page,
+            pageSize,
+            cancellationToken);
+
+        if (result.IsFailure)
+            return ToProblem(result.Error);
+
+        var response = result.Value
+            .Select(ToResponse)
+            .ToList();
+
+        return Ok(response);
+    }
 
     [HttpPatch("{id:guid}/change-user-name")]
     [Authorize(Roles = nameof(UserRole.Manager))]

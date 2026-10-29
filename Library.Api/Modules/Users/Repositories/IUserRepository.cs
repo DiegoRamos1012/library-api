@@ -9,6 +9,11 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(Guid id);
     Task<bool> ExistsByEmailAsync(string email);
     Task<User?> GetByEmailAsync(string email);
+    Task<List<User>> FindAllAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default); 
+    // CancellationToken permite que a operação assíncrona seja finalizada antes de terminar
     Task AddAsync(User user);
     Task SaveChangesAsync();
 }

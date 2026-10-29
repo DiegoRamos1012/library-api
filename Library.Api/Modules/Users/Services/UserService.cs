@@ -4,6 +4,7 @@ using Library.Api.Common.Utils;
 using Library.Api.Config.Security;
 using Library.Api.Modules.Users.Domain;
 using Library.Api.Modules.Users.Dtos.Request;
+using Library.Api.Modules.Users.Dtos.Response;
 using Library.Api.Modules.Users.Repositories;
 
 namespace Library.Api.Modules.Users.Services;
@@ -47,6 +48,19 @@ public class UserService (IUserRepository userRepository, PasswordHasher passwor
         var fetchedUser = await userRepository.GetByIdAsync(id);
 
         return fetchedUser is null ? Result<User>.Failure(UserErrors.NotFound) : Result<User>.Success(fetchedUser);
+    }
+    
+    public async Task<Result<IReadOnlyList<User>>> FindAllAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var users = await userRepository.FindAllAsync(
+            page,
+            pageSize,
+            cancellationToken);
+
+        return Result<IReadOnlyList<User>>.Success(users);
     }
 
     public async Task<Result<User>> ChangeUserNameAsync(Guid id, string newName)
