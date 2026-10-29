@@ -59,6 +59,24 @@ public sealed class UserController(UserService userService) : ApiControllerBase
         return Ok(response);
     }
     
+    // the ID comes from the token
+    [HttpPatch("me/password")]
+    public async Task<IActionResult> ChangeMyPassword(ChangePasswordRequest request)
+    {
+        var userId = CurrentUserId;
+
+        if (userId is null)
+            return Unauthorized();
+
+        var result = await userService.ChangePasswordAsync(
+            userId.Value, request.CurrentPassword, request.NewPassword);
+
+        if (result.IsFailure)
+            return ToProblem(result.Error);
+
+        return NoContent();
+    }
+    
     [HttpPatch("{id:guid}/deactivate")]
     [Authorize(Roles = nameof(UserRole.Manager))]
     public async Task<ActionResult<UserResponse>> DeactivateUser(Guid id)

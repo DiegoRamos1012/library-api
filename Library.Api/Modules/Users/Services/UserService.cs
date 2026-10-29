@@ -65,6 +65,32 @@ public class UserService (IUserRepository userRepository, PasswordHasher passwor
 
         return Result<User>.Success(fetchedUser);
     }
+    
+   
+    public async Task<Result<User>> ChangePasswordAsync(Guid id, string currentPassword, string newPassword)
+    {
+        var fetchedUser = await userRepository.GetByIdAsync(id);
+
+        if (fetchedUser is null)
+            return Result<User>.Failure(UserErrors.NotFound);
+
+        if (!fetchedUser.IsActive)
+            return Result<User>.Failure(UserErrors.UserDeactivated);
+        
+        if (!passwordHasher.VerifyPassword(currentPassword, fetchedUser.PasswordHash))
+            return Result<User>.Failure(UserErrors.InvalidCurrentPassword);
+
+        if (passwordHasher.VerifyPassword(newPassword, fetchedUser.PasswordHash))
+            return Result<User>.Failure(UserErrors.SamePassword);
+
+        var newPasswordHash = passwordHasher.PasswordEncoder(newPassword);
+
+        fetchedUser.ChangePassword(newPasswordHash);
+
+        await userRepository.SaveChangesAsync();
+
+        return Result<User>.Success(fetchedUser);
+    }
 
     public async Task<Result<User>> DeactivateUserAsync(Guid id)
     {

@@ -67,6 +67,7 @@ public class User : BaseEntity
 
         PasswordHash = newPasswordHash;
     }
+    
     public void Deactivate()
     {
         IsActive = false;

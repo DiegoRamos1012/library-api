@@ -1,4 +1,6 @@
-﻿using Library.Api.Common.Results;
+﻿using System.Security.Claims;
+using Library.Api.Common.Results;
+using Library.Api.Modules.Users.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Common.Controllers;
@@ -11,10 +13,17 @@ public abstract class ApiControllerBase : ControllerBase
         var statusCode = error.Code switch
         {
             "USER_NOT_FOUND" => StatusCodes.Status404NotFound,
-            "USER_EMAIL_ALREADY_EXISTS" or "USER_ALREADY_DEACTIVATED" or "USER_ALREADY_ACTIVATED" or "USER_DEACTIVATED" 
+
+            "USER_EMAIL_ALREADY_EXISTS" or "USER_ALREADY_DEACTIVATED"
+                or "USER_ALREADY_ACTIVATED" or "USER_DEACTIVATED"
                 => StatusCodes.Status409Conflict,
-            "USER_INVALID_INPUT" => StatusCodes.Status400BadRequest,
+
+            "USER_INVALID_INPUT" or "USER_SAME_PASSWORD"
+                or "USER_INVALID_CURRENT_PASSWORD"
+                => StatusCodes.Status400BadRequest,
+
             "AUTH_INVALID_CREDENTIALS" => StatusCodes.Status401Unauthorized,
+
             _ => StatusCodes.Status500InternalServerError
         };
         
@@ -30,4 +39,23 @@ public abstract class ApiControllerBase : ControllerBase
                 }
         );
     }
+    
+    protected Guid? CurrentUserId =>
+        Guid.TryParse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub"),
+            out var id) ? id : null;
+    
+    // Método auxiliar que controla se um usuário pode alterar outro
+    /*
+     protected bool CanManageUser(Guid targetUserId)
+    {
+        if (User.IsInRole(nameof(UserRole.Manager)))
+            return true;
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        return Guid.TryParse(userIdClaim?.Value, out var currentUserId)
+               && currentUserId == targetUserId;
+    } 
+    */
 }
