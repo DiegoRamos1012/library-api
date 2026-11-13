@@ -4,7 +4,6 @@ using Library.Api.Common.Utils;
 using Library.Api.Config.Security;
 using Library.Api.Modules.Users.Domain;
 using Library.Api.Modules.Users.Dtos.Request;
-using Library.Api.Modules.Users.Dtos.Response;
 using Library.Api.Modules.Users.Repositories;
 
 namespace Library.Api.Modules.Users.Services;
